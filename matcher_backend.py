@@ -1,11 +1,18 @@
-
 import re
 import spacy
 import pandas as pd
 from sentence_transformers import SentenceTransformer, util
 import PyPDF2
 
-nlp = spacy.load("en_core_web_sm")
+# ✅ Automatically download the spaCy model if not available (Streamlit fix)
+try:
+    nlp = spacy.load("en_core_web_sm")
+except OSError:
+    from spacy.cli import download
+    download("en_core_web_sm")
+    nlp = spacy.load("en_core_web_sm")
+
+# Load SentenceTransformer model
 model = SentenceTransformer("all-MiniLM-L6-v2")
 
 def extract_text_from_pdf(file):

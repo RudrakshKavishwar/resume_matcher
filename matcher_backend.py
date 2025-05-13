@@ -3,23 +3,25 @@ import spacy
 import pandas as pd
 from sentence_transformers import SentenceTransformer, util
 import PyPDF2
+import subprocess
 
-try:
-    # Try to load spaCy's prebuilt model
-    nlp = spacy.load("en_core_web_sm")
-except:
-    # Fall back to blank pipeline and manually add components
-    nlp = spacy.blank("en")
+# ✅ Safe model loader for spaCy
+def load_spacy_model():
+    try:
+        return spacy.load("en_core_web_sm")
+    except OSError:
+        subprocess.run(["python", "-m", "spacy", "download", "en_core_web_sm"])
+        return spacy.load("en_core_web_sm")
 
-    if "parser" not in nlp.pipe_names:
-        nlp.add_pipe("parser")
-        # ❌ DO NOT call `nlp.initialize()` – not needed for built-in components
+# ✅ Load prebuilt model (already initialized and contains tagger, parser, etc.)
+nlp = load_spacy_model()
 
+# ✅ Sentence-BERT model for semantic similarity
 model = SentenceTransformer("all-MiniLM-L6-v2")
 
 def extract_text_from_pdf(file):
     reader = PyPDF2.PdfReader(file)
-    return "".join([page.extract_text() for page in reader.pages])
+    return "".join([page.extract_text() for page in reader.pages if page.extract_text()])
 
 def clean_text(text):
     text = re.sub(r"\n+", " ", text)

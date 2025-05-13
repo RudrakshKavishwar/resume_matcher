@@ -4,19 +4,16 @@ import pandas as pd
 from sentence_transformers import SentenceTransformer, util
 import PyPDF2
 import subprocess
+import importlib.util
 
-# ✅ Safe model loader for spaCy
+# ✅ Safe model loader that auto-downloads if missing
 def load_spacy_model():
-    try:
-        return spacy.load("en_core_web_sm")
-    except OSError:
-        subprocess.run(["python", "-m", "spacy", "download", "en_core_web_sm"])
-        return spacy.load("en_core_web_sm")
+    model_name = "en_core_web_sm"
+    if not importlib.util.find_spec(model_name):
+        subprocess.run(["python", "-m", "spacy", "download", model_name])
+    return spacy.load(model_name)
 
-# ✅ Load prebuilt model (already initialized and contains tagger, parser, etc.)
 nlp = load_spacy_model()
-
-# ✅ Sentence-BERT model for semantic similarity
 model = SentenceTransformer("all-MiniLM-L6-v2")
 
 def extract_text_from_pdf(file):

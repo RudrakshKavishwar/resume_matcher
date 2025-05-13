@@ -4,11 +4,17 @@ import pandas as pd
 from sentence_transformers import SentenceTransformer, util
 import PyPDF2
 
-# ✅ Load lightweight English model for noun chunking
-nlp = spacy.blank("en")
-if "tagger" not in nlp.pipe_names:
-    from spacy.pipeline import Tagger
-    nlp.add_pipe("tagger")
+# Try loading en_core_web_sm if available
+try:
+    nlp = spacy.load("en_core_web_sm")
+except:
+    # Use blank English pipeline
+    nlp = spacy.blank("en")
+
+    # Add tagger component manually if not present
+    if "tagger" not in nlp.pipe_names:
+        nlp.add_pipe("tagger")
+        nlp.initialize()  # ✅ This is required to prevent the E109 error
 
 model = SentenceTransformer("all-MiniLM-L6-v2")
 

@@ -4,17 +4,16 @@ import pandas as pd
 from sentence_transformers import SentenceTransformer, util
 import PyPDF2
 
-# Try loading en_core_web_sm if available
 try:
+    # Try to load spaCy's prebuilt model
     nlp = spacy.load("en_core_web_sm")
 except:
-    # Use blank English pipeline
+    # Fall back to blank pipeline and manually add components
     nlp = spacy.blank("en")
 
-    # Add tagger component manually if not present
-    if "tagger" not in nlp.pipe_names:
-        nlp.add_pipe("tagger")
-        nlp.initialize()  # ✅ This is required to prevent the E109 error
+    if "parser" not in nlp.pipe_names:
+        nlp.add_pipe("parser")
+        # ❌ DO NOT call `nlp.initialize()` – not needed for built-in components
 
 model = SentenceTransformer("all-MiniLM-L6-v2")
 

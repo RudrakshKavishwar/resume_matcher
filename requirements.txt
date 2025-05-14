@@ -1,6 +1,8 @@
-streamlit
-pandas
-PyPDF2
-spacy
-sentence-transformers
-torch
+streamlit==1.34.0
+pandas==2.2.2
+spacy==3.7.4
+en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1.tar.gz
+PyPDF2==3.0.1
+sentence-transformers==2.7.0
+torch==2.1.2
+numpy==1.24.4

@@ -23,14 +23,13 @@ if uploaded_resume and uploaded_csv:
         df = pd.read_csv(uploaded_csv)
         jobs_df = prepare_jobs_df(df)
 
-        if jobs_df is not None:
-            with st.spinner("Matching your resume with job descriptions..."):
-                matches = match_resume_to_jobs(resume_text, resume_skills, jobs_df)
-                st.success("✅ Top Matching Jobs Found!")
-                st.dataframe(matches)
+        with st.spinner("Matching your resume with job descriptions..."):
+            matches = match_resume_to_jobs(resume_text, resume_skills, jobs_df)
+            st.success("✅ Top Matching Jobs Found!")
+            st.dataframe(matches)
 
-                csv = matches.to_csv(index=False).encode('utf-8')
-                st.download_button("📥 Download Results as CSV", csv, "job_matches.csv", "text/csv")
+            csv = matches.to_csv(index=False).encode('utf-8')
+            st.download_button("📥 Download Results as CSV", csv, "job_matches.csv", "text/csv")
 
     except Exception as e:
         st.error(f"⚠️ Error: {e}")

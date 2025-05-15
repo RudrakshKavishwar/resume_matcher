@@ -6,7 +6,6 @@ import PyPDF2
 import subprocess
 import importlib.util
 
-# ✅ Safe model loader: Downloads spaCy model if not already installed
 def load_spacy_model():
     model_name = "en_core_web_sm"
     try:
@@ -15,31 +14,26 @@ def load_spacy_model():
         subprocess.run(["python", "-m", "spacy", "download", model_name])
         return spacy.load(model_name)
 
-# Load NLP models
 nlp = load_spacy_model()
 model = SentenceTransformer("all-MiniLM-L6-v2")
 
-# ✅ Extracts text from uploaded PDF file
 def extract_text_from_pdf(file):
     reader = PyPDF2.PdfReader(file)
     return " ".join([page.extract_text() for page in reader.pages if page.extract_text()])
 
-# ✅ Basic cleaning: removes special characters, extra spaces
 def clean_text(text):
     text = re.sub(r"\n+", " ", text)
     text = re.sub(r"[^\w\s.,]", "", text)
     return text.strip()
 
-# ✅ Extracts key noun phrases (skills) using spaCy
 def extract_skills(text):
     doc = nlp(text)
     return list(set(
-        chunk.text.lower().strip() 
-        for chunk in doc.noun_chunks 
+        chunk.text.lower().strip()
+        for chunk in doc.noun_chunks
         if 1 <= len(chunk.text.split()) <= 4
     ))
 
-# ✅ Prepares and cleans the job dataframe
 def prepare_jobs_df(df):
     df.columns = [col.strip().lower() for col in df.columns]
     title_col = next((col for col in df.columns if 'title' in col), None)
@@ -55,7 +49,6 @@ def prepare_jobs_df(df):
     df.reset_index(drop=True, inplace=True)
     return df
 
-# ✅ Matches resume to job descriptions based on semantic similarity + skill overlap
 def match_resume_to_jobs(resume_text, resume_skills, jobs_df, top_k=10):
     resume_embedding = model.encode(resume_text, convert_to_tensor=True)
     results = []
@@ -68,8 +61,8 @@ def match_resume_to_jobs(resume_text, resume_skills, jobs_df, top_k=10):
         semantic_score = util.cos_sim(resume_embedding, job_embedding).item()
 
         job_keywords = set(
-            chunk.text.lower().strip() 
-            for chunk in nlp(job_desc).noun_chunks 
+            chunk.text.lower().strip()
+            for chunk in nlp(job_desc).noun_chunks
             if 1 <= len(chunk.text.split()) <= 4
         )
         skill_score = len(set(resume_skills) & job_keywords) / len(job_keywords) if job_keywords else 0

@@ -41,3 +41,9 @@ This project simulates an **ATS-like system** by:
 ---
 
 ## 📂 Project Structure
+resume_matcher/
+│── notebook.ipynb # Core model (Google Colab)
+│── app/ # Application logic (if present)
+│── data/ # Sample resumes & job descriptions
+│── requirements.txt
+│── README.md
